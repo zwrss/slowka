@@ -21,14 +21,15 @@ object GUI {
         Dictionary.parseFile(filename)
         var flag = true
         while(flag) {
-          val (keyWord, valueWord) = Dictionary.getWord
+          val (keyWord, valueWord, score) = Dictionary.getWord
           JOptionPane.showMessageDialog(null, keyWord, "Zapytanie", JOptionPane.INFORMATION_MESSAGE)
           val ans = JOptionPane.showConfirmDialog(null, keyWord + "\n" + valueWord, "Poprawnie?",  JOptionPane.YES_NO_OPTION)
           ans match {
-            case JOptionPane.YES_OPTION => Dictionary.correct()
-            case JOptionPane.NO_OPTION => Dictionary.incorrect()
-            case _ => flag = false
+            case JOptionPane.YES_OPTION => Dictionary.correct(keyWord, valueWord, score)
+            case JOptionPane.NO_OPTION => Dictionary.incorrect(keyWord, valueWord, score)
+            case _ =>
           }
+          if(Dictionary.dictionary.isEmpty) flag = false
         }
       } catch {
         case t: FileNotFoundException =>

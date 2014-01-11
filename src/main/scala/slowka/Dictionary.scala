@@ -8,7 +8,6 @@ object Dictionary {
   val random = new Random(System.nanoTime())
 
   var dictionary: Map[String, (String, Int)] = Map.empty
-  var lastWord: (String, String, Int) = _
 
   def parseFile(filename: String) {
     val scanner: BufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "windows-1250"))
@@ -25,8 +24,7 @@ object Dictionary {
     dictionary = dictionary.updated(keyWord, (valueWord, 1000))
   }
 
-  def getWord: (String, String) = {
-
+  def getWord: (String, String, Int) = {
     def choose(max: Int, min: Int): (String, String, Int) = {
       val keysArray = dictionary.keys.toArray
       val key = keysArray(random.nextInt(dictionary.size))
@@ -41,16 +39,16 @@ object Dictionary {
       (scores.max, scores.min)
     }
 
-    lastWord = choose(max, min)
-    (lastWord._1, lastWord._2)
+    choose(max, min)
   }
 
-  def correct() {
-    dictionary = dictionary.updated(lastWord._1, (lastWord._2, lastWord._3 + 1))
+  def correct(keyWord: String, valueWord: String, score: Int) {
+    if(score < 100) dictionary = dictionary.updated(keyWord, (valueWord, score + 1))
+    else dictionary = dictionary.filterKeys(_ != keyWord)
   }
 
-  def incorrect() {
-    dictionary = dictionary.updated(lastWord._1, (lastWord._2, lastWord._3 - 1))
+  def incorrect(keyWord: String, valueWord: String, score: Int) {
+    dictionary = dictionary.updated(keyWord, (valueWord, score - 1))
   }
 
 }
