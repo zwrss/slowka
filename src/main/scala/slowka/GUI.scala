@@ -1,7 +1,8 @@
 package slowka
 
 import java.awt.FileDialog
-import javax.swing.JFrame
+import javax.swing.{JOptionPane, JFrame}
+import java.awt.TrayIcon.MessageType
 
 
 object GUI {
@@ -16,7 +17,23 @@ object GUI {
     val filename = fd.getDirectory + fd.getFile
 
     if (filename != null) {
-      Dictionary(filename)
+      try {
+        Dictionary.parseFile(filename)
+        println(Dictionary.dictionary)
+        var flag = true
+        while(flag) {
+          val (keyWord, valueWord) = Dictionary.getWord
+          JOptionPane.showMessageDialog(null, keyWord, "Zapytanie", JOptionPane.INFORMATION_MESSAGE)
+          val ans = JOptionPane.showConfirmDialog(null, keyWord + "\n" + valueWord, "Poprawnie?",  JOptionPane.YES_NO_OPTION)
+          ans match {
+            case JOptionPane.YES_OPTION => Dictionary.correct()
+            case JOptionPane.NO_OPTION => Dictionary.incorrect()
+            case _ => flag = false
+          }
+        }
+      } catch {
+        case t: Throwable =>
+      }
     }
 
     frame.dispose()
