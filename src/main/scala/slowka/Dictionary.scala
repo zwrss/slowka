@@ -43,7 +43,7 @@ object Dictionary {
   }
 
   def correct(keyWord: String, valueWord: String, score: Int) {
-    if(score < 100) dictionary = dictionary.updated(keyWord, (valueWord, score + 1))
+    if(score < 1003) dictionary = dictionary.updated(keyWord, (valueWord, score + 1))
     else dictionary = dictionary.filterKeys(_ != keyWord)
   }
 
