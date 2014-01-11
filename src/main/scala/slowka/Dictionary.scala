@@ -26,7 +26,7 @@ class Dictionary {
   }
 
   def getWord: KeyValue = {
-
+    ???
   }
 
 }
