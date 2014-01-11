@@ -29,6 +29,8 @@ object GUI {
             case JOptionPane.NO_OPTION => Dictionary.incorrect(keyWord, valueWord, score)
             case _ =>
           }
+          println(Dictionary.dictionary.size)
+          if(Dictionary.dictionary.size < 20) Dictionary.readWordFromFile
           if(Dictionary.dictionary.isEmpty) flag = false
         }
       } catch {

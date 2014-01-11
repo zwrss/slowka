@@ -2,6 +2,7 @@ package slowka
 
 import java.io._
 import scala.util.Random
+import javax.swing.JOptionPane
 
 object Dictionary {
 
@@ -9,19 +10,33 @@ object Dictionary {
 
   var dictionary: Map[String, (String, Int)] = Map.empty
 
-  def parseFile(filename: String) {
-    val scanner: BufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "windows-1250"))
-    while(scanner.ready()) {
+  var scanner: BufferedReader = _
+
+  def readWordFromFile: Boolean = {
+    if(scanner.ready()) {
       val line = scanner.readLine()
       line.split(':') match {
         case Array(valueWord, keyWord) => addWord(keyWord, valueWord)
+        case Array("") => false
         case _ =>
+          JOptionPane.showMessageDialog(null, "UWAGA, uszkodzona linia: " + line)
+          false
       }
-    }
+    } else false
   }
 
-  def addWord(keyWord: String, valueWord: String) {
-    dictionary = dictionary.updated(keyWord, (valueWord, 1000))
+  def parseFile(filename: String) {
+    scanner = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "windows-1250"))
+    var counter = 0
+    while(counter < 20) if(readWordFromFile) counter += 1
+  }
+
+  def addWord(keyWord: String, valueWord: String): Boolean = {
+    if(dictionary.contains(keyWord)) false
+    else {
+      dictionary = dictionary.updated(keyWord, (valueWord, 1000))
+      dictionary.contains(keyWord)
+    }
   }
 
   def getWord: (String, String, Int) = {
