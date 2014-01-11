@@ -2,7 +2,7 @@ package slowka
 
 import java.awt.FileDialog
 import javax.swing.{JOptionPane, JFrame}
-import java.awt.TrayIcon.MessageType
+import java.io.FileNotFoundException
 
 
 object GUI {
@@ -19,7 +19,6 @@ object GUI {
     if (filename != null) {
       try {
         Dictionary.parseFile(filename)
-        println(Dictionary.dictionary)
         var flag = true
         while(flag) {
           val (keyWord, valueWord) = Dictionary.getWord
@@ -32,7 +31,7 @@ object GUI {
           }
         }
       } catch {
-        case t: Throwable =>
+        case t: FileNotFoundException =>
       }
     }
 

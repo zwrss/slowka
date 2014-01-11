@@ -7,11 +7,11 @@ object Dictionary {
 
   val random = new Random(System.nanoTime())
 
-  var dictionary: Map[Int, Map[String, String]] = Map.empty[Int, Map[String, String]]
+  var dictionary: Map[String, (String, Int)] = Map.empty
   var lastWord: (String, String, Int) = _
 
   def parseFile(filename: String) {
-    val scanner: BufferedReader = new BufferedReader(new FileReader(new File(filename)))
+    val scanner: BufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "windows-1250"))
     while(scanner.ready()) {
       val line = scanner.readLine()
       line.split(':') match {
@@ -22,46 +22,35 @@ object Dictionary {
   }
 
   def addWord(keyWord: String, valueWord: String) {
-    val m = dictionary.get(1000).getOrElse(Map.empty).updated(keyWord, valueWord)
-    dictionary = dictionary.updated(1000, m)
+    dictionary = dictionary.updated(keyWord, (valueWord, 1000))
   }
 
   def getWord: (String, String) = {
-    println(dictionary.values.flatMap(_.values).size)
-    val scores = random.shuffle(dictionary.keys.toList)
-    println(dictionary.keys.toList)
-    println(scores)
-    val rand = random.nextInt(scores.max - scores.min + 1) + scores.min + 1
-    val score = scores.find(_ < rand).get
-    val map = dictionary.get(score).get
-    val keyArray = map.keys.toArray
-    val keyWord = keyArray(random.nextInt(keyArray.size)) //random.shuffle(map.keys).head
-    lastWord = (keyWord, map.get(keyWord).get, score)
+
+    def choose(max: Int, min: Int): (String, String, Int) = {
+      val keysArray = dictionary.keys.toArray
+      val key = keysArray(random.nextInt(dictionary.size))
+      val (value, score) = dictionary.get(key).get
+      val r = random.nextInt(max - min + 1) + min
+      if(score <= r) (key, value, score)
+      else choose(max, min)
+    }
+
+    val (max, min) = {
+      val scores = dictionary.values.map(_._2)
+      (scores.max, scores.min)
+    }
+
+    lastWord = choose(max, min)
     (lastWord._1, lastWord._2)
   }
 
   def correct() {
-    val keyWord = lastWord._1
-    val valueWord = lastWord._2
-    val oldScore = lastWord._3
-    val m = dictionary.get(oldScore).get.filterKeys(_ != keyWord)
-    val m2 = dictionary.get(oldScore + 1).getOrElse(Map.empty).updated(keyWord, valueWord)
-    if(m.isEmpty) dictionary = dictionary.filterKeys(_ != oldScore)
-    else dictionary = dictionary.updated(oldScore, m)
-    dictionary = dictionary.updated(oldScore + 1, m2)
+    dictionary = dictionary.updated(lastWord._1, (lastWord._2, lastWord._3 + 1))
   }
 
   def incorrect() {
-    val keyWord = lastWord._1
-    val valueWord = lastWord._2
-    val oldScore = lastWord._3
-    if(oldScore > 0) {
-      val m = dictionary.get(oldScore).get.filterKeys(_ != keyWord)
-      val m2 = dictionary.get(oldScore - 1).getOrElse(Map.empty).updated(keyWord, valueWord)
-      if(m.isEmpty) dictionary = dictionary.filterKeys(_ != oldScore)
-      else dictionary = dictionary.updated(oldScore, m)
-      dictionary = dictionary.updated(oldScore - 1, m2)
-    }
+    dictionary = dictionary.updated(lastWord._1, (lastWord._2, lastWord._3 - 1))
   }
 
 }
