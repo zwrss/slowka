@@ -5,6 +5,8 @@ import scala.util.Random
 
 object Dictionary {
 
+  val random = new Random(System.nanoTime())
+
   var dictionary: Map[Int, Map[String, String]] = Map.empty[Int, Map[String, String]]
   var lastWord: (String, String, Int) = _
 
@@ -25,11 +27,15 @@ object Dictionary {
   }
 
   def getWord: (String, String) = {
-    val scores = dictionary.keys.toList.sorted.reverse
-    val rand = Random.nextInt(scores.max - scores.min + 2) + scores.min + 1
+    println(dictionary.values.flatMap(_.values).size)
+    val scores = random.shuffle(dictionary.keys.toList)
+    println(dictionary.keys.toList)
+    println(scores)
+    val rand = random.nextInt(scores.max - scores.min + 1) + scores.min + 1
     val score = scores.find(_ < rand).get
     val map = dictionary.get(score).get
-    val keyWord = Random.shuffle(map.keys).head
+    val keyArray = map.keys.toArray
+    val keyWord = keyArray(random.nextInt(keyArray.size)) //random.shuffle(map.keys).head
     lastWord = (keyWord, map.get(keyWord).get, score)
     (lastWord._1, lastWord._2)
   }
